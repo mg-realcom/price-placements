@@ -127,79 +127,76 @@ func (f *RealtyFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *RealtyFeed) Check() (err error) {
+func (f *RealtyFeed) Check() (errs []error) {
 
 	if len(f.Offer) == 0 {
-		return errors.New("feed is empty")
+		errs = append(errs, errors.New("feed is empty"))
+		return errs
 	}
 	for idx, lot := range f.Offer {
 		if lot.InternalID == "" {
-			return fmt.Errorf("field InternalID is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field InternalID is empty. Position: %v", idx))
 		}
 		if lot.Type == "" {
-			return fmt.Errorf("field Type is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Type is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.PropertyType == "" {
-			return fmt.Errorf("field PropertyType is empty. InternalID: %v", lot.InternalID)
-		}
-		if lot.URL == "" {
-			return fmt.Errorf("field URL is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field PropertyType is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.CreationDate == "" {
-			return fmt.Errorf("field CreationDate is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field CreationDate is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Location.Country == "" {
-			return fmt.Errorf("field Location.Country is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Location.Country is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.SalesAgent.Phone == "" {
-			return fmt.Errorf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.SalesAgent.Category == "" {
-			return fmt.Errorf("field SalesAgent.Category is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field SalesAgent.Category is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.DealStatus == "" {
-			return fmt.Errorf("field DealStatus is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field DealStatus is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Price.Value == 0 {
-			return fmt.Errorf("field Price.Value is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Price.Value is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Price.Currency == "" {
-			return fmt.Errorf("field Price.Currency is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Price.Currency is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Area.Value == 0 {
-			return fmt.Errorf("field Area.Value is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Area.Value is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Area.Unit == "" {
-			return fmt.Errorf("field Area.Unit is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.NewFlat == "" {
-			return fmt.Errorf("field NewFlat is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field NewFlat is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Floor == 0 {
-			return fmt.Errorf("field Floor is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field Floor is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.FloorsTotal == 0 {
-			return fmt.Errorf("field FloorsTotal is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field FloorsTotal is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuildingName == "" {
-			return fmt.Errorf("field BuildingName is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field BuildingName is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.YandexBuildingID == 0 {
-			return fmt.Errorf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.YandexHouseID == 0 {
-			return fmt.Errorf("field YandexHouseID is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field YandexHouseID is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuildingState == "" {
-			return fmt.Errorf("field BuildingState is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field BuildingState is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuiltYear == 0 {
-			return fmt.Errorf("field BuiltYear is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field BuiltYear is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.ReadyQuarter == 0 {
-			return fmt.Errorf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID)
+			errs = append(errs, fmt.Errorf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID))
 		}
-
 	}
-	return err
+	return errs
 }

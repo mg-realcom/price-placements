@@ -143,14 +143,20 @@ func (f *CianFeed) Check() (err error) {
 		if lot.FloorNumber == 0 {
 			return fmt.Errorf("field FloorNumber is empty. Position: %v", idx)
 		}
+		if lot.Building.FloorsCount == 0 {
+			return fmt.Errorf("field Building.FloorsCount is empty. Position: %v", idx)
+		}
 		if lot.JKSchema.ID == 0 {
 			return fmt.Errorf("field JKSchema.ID is empty. Position: %v", idx)
+		}
+		if lot.JKSchema.Name == "" {
+			return fmt.Errorf("field JKSchema.Name is empty. Position: %v", idx)
 		}
 		if lot.JKSchema.House.ID == 0 {
 			return fmt.Errorf("field JKSchema.House.ID is empty. Position: %v", idx)
 		}
-		if lot.Building.FloorsCount == 0 {
-			return fmt.Errorf("field Building.FloorsCount is empty. Position: %v", idx)
+		if lot.JKSchema.House.Name == "" {
+			return fmt.Errorf("field JKSchema.House.Name is empty. Position: %v", idx)
 		}
 		if lot.BargainTerms.Price == 0 {
 			return fmt.Errorf("field BargainTerms.Price is empty. Position: %v", idx)

@@ -12,7 +12,7 @@ import (
 type AvitoFeed struct {
 	LastModified  time.Time
 	XMLName       xml.Name `xml:"Ads"`
-	FormatVersion string   `xml:"formatVersion,attr"`
+	FormatVersion int      `xml:"formatVersion,attr"`
 	Target        string   `xml:"target,attr"`
 	Ad            []Ad     `xml:"Ad"`
 }
@@ -75,6 +75,7 @@ func (f *AvitoFeed) Get(url string) (err error) {
 	if err != nil {
 		return err
 	}
+
 	err = xml.Unmarshal(responseBody, &f)
 	if err != nil {
 		return err
@@ -83,57 +84,64 @@ func (f *AvitoFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *AvitoFeed) Check() (err error) {
+func (f *AvitoFeed) Check() (errs []error) {
+
 	if len(f.Ad) == 0 {
-		return errors.New("feed is empty")
+		errs = append(errs, errors.New("feed is empty"))
+		return errs
 	}
+	if len(f.Ad) <= 10 {
+		errs = append(errs, fmt.Errorf("feed  contains only %v items", len(f.Ad)))
+		return errs
+	}
+
 	for idx, lot := range f.Ad {
 		if lot.ID == "" {
-			return fmt.Errorf("field ID is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field ID is empty. Position: %v", idx))
 		}
 		if lot.Description == "" {
-			return fmt.Errorf("field Description is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Description is empty. Position: %v", idx))
 		}
 		if lot.Category == "" {
-			return fmt.Errorf("field Category is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Category is empty. Position: %v", idx))
 		}
 		if lot.Price == 0 {
-			return fmt.Errorf("field Price is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Price is empty. Position: %v", idx))
 		}
 		if lot.OperationType == "" {
-			return fmt.Errorf("field OperationType is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field OperationType is empty. Position: %v", idx))
 		}
 		if lot.MarketType == "" {
-			return fmt.Errorf("field MarketType is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field MarketType is empty. Position: %v", idx))
 		}
 		if lot.HouseType == "" {
-			return fmt.Errorf("field HouseType is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field HouseType is empty. Position: %v", idx))
 		}
 		if lot.Floor == 0 {
-			return fmt.Errorf("field Floor is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Floor is empty. Position: %v", idx))
 		}
 		if lot.Floors == 0 {
-			return fmt.Errorf("field Floors is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Floors is empty. Position: %v", idx))
 		}
 		if lot.Rooms == "" {
-			return fmt.Errorf("field Rooms is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Rooms is empty. Position: %v", idx))
 		}
 		if lot.Square == 0 {
-			return fmt.Errorf("field Square is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Square is empty. Position: %v", idx))
 		}
 		if lot.Status == "" {
-			return fmt.Errorf("field Status is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Status is empty. Position: %v", idx))
 		}
 		if lot.NewDevelopmentId == "" {
-			return fmt.Errorf("field NewDevelopmentId is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field NewDevelopmentId is empty. Position: %v", idx))
 		}
 		if lot.PropertyRights == "" {
-			return fmt.Errorf("field PropertyRights is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field PropertyRights is empty. Position: %v", idx))
 		}
 		if lot.Decoration == "" {
-			return fmt.Errorf("field Decoration is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Decoration is empty. Position: %v", idx))
 		}
 
 	}
-	return err
+	return errs
 }
