@@ -3,6 +3,7 @@ package price_placements_feeds
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -155,9 +156,53 @@ func (f *DomclickFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *DomclickFeed) Check() (err error) {
+func (f *DomclickFeed) Check() (errs []error) {
 	if len(f.Complex.Buildings.Building) == 0 {
-		return errors.New("feed is empty")
+		errs = append(errs, errors.New("feed is empty"))
+		return errs
 	}
-	return err
+	if f.Complex.ID == "" {
+		errs = append(errs, fmt.Errorf("field Complex.ID is empty"))
+	}
+
+	if f.Complex.Name == "" {
+		errs = append(errs, fmt.Errorf("field Complex.Name is empty"))
+	}
+
+	if f.Complex.Address == "" {
+		errs = append(errs, fmt.Errorf("field Complex.Address is empty"))
+	}
+
+	if f.Complex.DescriptionMain.Title == "" {
+		errs = append(errs, fmt.Errorf("field Complex.DescriptionMain.Title is empty"))
+	}
+
+	if f.Complex.DescriptionMain.Text == "" {
+		errs = append(errs, fmt.Errorf("field Complex.DescriptionMain.Text is empty"))
+	}
+
+	for _, building := range f.Complex.Buildings.Building {
+		for idx, lot := range building.Flats.Flat {
+			if lot.FlatID == "" {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.FlatID is empty. Position: %v \n", building.ID, idx))
+			}
+			if lot.FlatID == "" {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.Flat.FlatID is empty. Position: %v \n", building.ID, idx))
+			}
+			if lot.Room == "" {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.Flat.Room is empty. Position: %v \n", building.ID, idx))
+			}
+			if lot.Price == 0 {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.Flat.Price is empty. Position: %v \n", building.ID, idx))
+			}
+			if lot.Area == 0 {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.Flat.Area is empty. Position: %v \n", building.ID, idx))
+			}
+			if lot.Area == 0 {
+				errs = append(errs, fmt.Errorf("BuildingId: %s. Field Flats.Flat.Area is empty. Position: %v \n", building.ID, idx))
+			}
+		}
+	}
+
+	return errs
 }
