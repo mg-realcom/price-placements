@@ -61,6 +61,12 @@ func (f *AvitoFeed) Get(url string) (err error) {
 	if err != nil {
 		return err
 	}
+
+	err = statusCodeHandler(resp)
+	if err != nil {
+		return err
+	}
+
 	AttributeLastModified := resp.Header.Get("Last-Modified")
 	if AttributeLastModified != "" {
 		lastModifiedDate, err := time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
@@ -91,7 +97,7 @@ func (f *AvitoFeed) Check() (errs []error) {
 		return errs
 	}
 	if len(f.Ad) <= 10 {
-		errs = append(errs, fmt.Errorf("feed  contains only %v items", len(f.Ad)))
+		errs = append(errs, fmt.Errorf("feed contains only %v items", len(f.Ad)))
 		return errs
 	}
 
@@ -144,4 +150,57 @@ func (f *AvitoFeed) Check() (errs []error) {
 
 	}
 	return errs
+}
+
+type AvitoDevelopments struct {
+	Region []AvitoRegion `xml:"Region"`
+}
+
+type AvitoRegion struct {
+	Name string      `xml:"name,attr"`
+	City []AvitoCity `xml:"City"`
+}
+
+type AvitoCity struct {
+	Name   string        `xml:"name,attr"`
+	Object []AvitoObject `xml:"Object"`
+}
+
+type AvitoObject struct {
+	ID        string       `xml:"id,attr"`
+	Name      string       `xml:"name,attr"`
+	Address   string       `xml:"address,attr"`
+	Developer string       `xml:"developer,attr"`
+	Housing   []AvitoHouse `xml:"Housing"`
+}
+
+type AvitoHouse struct {
+	ID      string `xml:"id,attr"`
+	Name    string `xml:"name,attr"`
+	Address string `xml:"address,attr"`
+}
+
+func (f *AvitoFeed) GetDevelopments() (developments AvitoDevelopments, err error) {
+	url := "https://autoload.avito.ru/format/New_developments.xml"
+	resp, err := GetResponse(url)
+	defer resp.Body.Close()
+	if err != nil {
+		return developments, err
+	}
+
+	err = statusCodeHandler(resp)
+	if err != nil {
+		return developments, err
+	}
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return developments, err
+	}
+
+	err = xml.Unmarshal(responseBody, &developments)
+	if err != nil {
+		return developments, err
+	}
+	//TODO Исправить значение f.LastModified
+	return developments, err
 }

@@ -100,6 +100,11 @@ func (f *RealtyFeed) Get(url string) (err error) {
 		return err
 	}
 
+	err = statusCodeHandler(resp)
+	if err != nil {
+		return err
+	}
+
 	AttributeLastModified := resp.Header.Get("Last-Modified")
 	if AttributeLastModified != "" {
 		lastModifiedDate, err := time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
