@@ -129,44 +129,45 @@ func (f *CianFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *CianFeed) Check() (err error) {
+func (f *CianFeed) Check() (errs []error) {
 	if len(f.Object) == 0 {
-		return errors.New("feed is empty")
+		errs = append(errs, errors.New("feed is empty"))
+		return errs
 	}
 	for idx, lot := range f.Object {
 		if lot.ExternalId == "" {
-			return fmt.Errorf("field ExternalId is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field ExternalId is empty. Position: %v", idx))
 		}
 		if lot.Category == "" {
-			return fmt.Errorf("field Category is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Category is empty. Position: %v", idx))
 		}
 		if lot.FlatRoomsCount == 0 {
-			return fmt.Errorf("field FlatRoomsCount is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field FlatRoomsCount is empty. Position: %v", idx))
 		}
 		if lot.TotalArea == 0 {
-			return fmt.Errorf("field TotalArea is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field TotalArea is empty. Position: %v", idx))
 		}
 		if lot.FloorNumber == 0 {
-			return fmt.Errorf("field FloorNumber is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field FloorNumber is empty. Position: %v", idx))
 		}
 		if lot.Building.FloorsCount == 0 {
-			return fmt.Errorf("field Building.FloorsCount is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field Building.FloorsCount is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.ID == 0 {
-			return fmt.Errorf("field JKSchema.ID is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field JKSchema.ID is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.Name == "" {
-			return fmt.Errorf("field JKSchema.Name is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field JKSchema.Name is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.House.ID == 0 {
-			return fmt.Errorf("field JKSchema.House.ID is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field JKSchema.House.ID is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.House.Name == "" {
-			return fmt.Errorf("field JKSchema.House.Name is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field JKSchema.House.Name is empty. Position: %v", idx))
 		}
 		if lot.BargainTerms.Price == 0 {
-			return fmt.Errorf("field BargainTerms.Price is empty. Position: %v", idx)
+			errs = append(errs, fmt.Errorf("field BargainTerms.Price is empty. Position: %v", idx))
 		}
 	}
-	return err
+	return errs
 }
