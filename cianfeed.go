@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -64,10 +66,10 @@ type Object struct {
 		} `xml:"Deadline"`
 	} `xml:"Building"`
 	BargainTerms struct {
-		Price           float64 `xml:"Price"`
-		Currency        string  `xml:"Currency"`
-		MortgageAllowed bool    `xml:"MortgageAllowed"`
-		SaleType        string  `xml:"SaleType"`
+		Price           CustomFloat64 `xml:"Price"`
+		Currency        string        `xml:"Currency"`
+		MortgageAllowed bool          `xml:"MortgageAllowed"`
+		SaleType        string        `xml:"SaleType"`
 	} `xml:"BargainTerms"`
 	JKSchema struct {
 		ID    int32  `xml:"Id"`
@@ -93,6 +95,24 @@ type Object struct {
 		} `xml:"UndergroundInfoSchema"`
 	} `xml:"Undergrounds"`
 	IsApartments bool `xml:"isApartments"`
+}
+
+type CustomFloat64 struct {
+	Float64 float64
+}
+
+func (cf *CustomFloat64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+	s = strings.ReplaceAll(s, ",", ".")
+	float, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return err
+	}
+	cf.Float64 = float
+	return nil
 }
 
 func (f *CianFeed) Get(url string) (err error) {
@@ -165,7 +185,7 @@ func (f *CianFeed) Check() (errs []error) {
 		if lot.JKSchema.House.Name == "" {
 			errs = append(errs, fmt.Errorf("field JKSchema.House.Name is empty. Position: %v", idx))
 		}
-		if lot.BargainTerms.Price == 0 {
+		if lot.BargainTerms.Price.Float64 == 0 {
 			errs = append(errs, fmt.Errorf("field BargainTerms.Price is empty. Position: %v", idx))
 		}
 	}
