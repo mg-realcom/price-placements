@@ -2,7 +2,6 @@ package price_placements_feeds
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -149,45 +148,50 @@ func (f *CianFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *CianFeed) Check() (errs []error) {
+func (f *CianFeed) Check() (results []string) {
 	if len(f.Object) == 0 {
-		errs = append(errs, errors.New("feed is empty"))
-		return errs
+		results = append(results, emptyFeed)
+		return results
+	}
+
+	if len(f.Object) <= 10 {
+		results = append(results, fmt.Sprintf("feed contains only %v items", len(f.Object)))
+		return results
 	}
 	for idx, lot := range f.Object {
 		if lot.ExternalId == "" {
-			errs = append(errs, fmt.Errorf("field ExternalId is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field ExternalId is empty. Position: %v", idx))
 		}
 		if lot.Category == "" {
-			errs = append(errs, fmt.Errorf("field Category is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Category is empty. Position: %v", idx))
 		}
 		if lot.FlatRoomsCount == 0 {
-			errs = append(errs, fmt.Errorf("field FlatRoomsCount is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field FlatRoomsCount is empty. Position: %v", idx))
 		}
 		if lot.TotalArea == 0 {
-			errs = append(errs, fmt.Errorf("field TotalArea is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field TotalArea is empty. Position: %v", idx))
 		}
 		if lot.FloorNumber == 0 {
-			errs = append(errs, fmt.Errorf("field FloorNumber is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field FloorNumber is empty. Position: %v", idx))
 		}
 		if lot.Building.FloorsCount == 0 {
-			errs = append(errs, fmt.Errorf("field Building.FloorsCount is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Building.FloorsCount is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.ID == 0 {
-			errs = append(errs, fmt.Errorf("field JKSchema.ID is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field JKSchema.ID is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.Name == "" {
-			errs = append(errs, fmt.Errorf("field JKSchema.Name is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field JKSchema.Name is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.House.ID == 0 {
-			errs = append(errs, fmt.Errorf("field JKSchema.House.ID is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field JKSchema.House.ID is empty. Position: %v", idx))
 		}
 		if lot.JKSchema.House.Name == "" {
-			errs = append(errs, fmt.Errorf("field JKSchema.House.Name is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field JKSchema.House.Name is empty. Position: %v", idx))
 		}
 		if lot.BargainTerms.Price.Float64 == 0 {
-			errs = append(errs, fmt.Errorf("field BargainTerms.Price is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field BargainTerms.Price is empty. Position: %v", idx))
 		}
 	}
-	return errs
+	return results
 }

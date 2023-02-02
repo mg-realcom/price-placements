@@ -2,7 +2,6 @@ package price_placements_feeds
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -19,8 +18,7 @@ type RealtyFeed struct {
 type Offer struct {
 	InternalID string `xml:"internal-id,attr"`
 	Image      []struct {
-		Text string `xml:",chardata"`
-		Tag  string `xml:"tag,attr"`
+		Tag string `xml:"tag,attr"`
 	} `xml:"image"`
 	Type           string   `xml:"type"`
 	PropertyType   string   `xml:"property-type"`
@@ -132,76 +130,77 @@ func (f *RealtyFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *RealtyFeed) Check() (errs []error) {
+func (f *RealtyFeed) Check() (results []string) {
 
 	if len(f.Offer) == 0 {
-		errs = append(errs, errors.New("feed is empty"))
-		return errs
+		results = append(results, emptyFeed)
+		return results
 	}
+
 	for idx, lot := range f.Offer {
 		if lot.InternalID == "" {
-			errs = append(errs, fmt.Errorf("field InternalID is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field InternalID is empty. Position: %v", idx))
 		}
 		if lot.Type == "" {
-			errs = append(errs, fmt.Errorf("field Type is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Type is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.PropertyType == "" {
-			errs = append(errs, fmt.Errorf("field PropertyType is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field PropertyType is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.CreationDate == "" {
-			errs = append(errs, fmt.Errorf("field CreationDate is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field CreationDate is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Location.Country == "" {
-			errs = append(errs, fmt.Errorf("field Location.Country is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Location.Country is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.SalesAgent.Phone == "" {
-			errs = append(errs, fmt.Errorf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.SalesAgent.Category == "" {
-			errs = append(errs, fmt.Errorf("field SalesAgent.Category is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field SalesAgent.Category is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.DealStatus == "" {
-			errs = append(errs, fmt.Errorf("field DealStatus is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field DealStatus is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Price.Value == 0 {
-			errs = append(errs, fmt.Errorf("field Price.Value is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Price.Value is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Price.Currency == "" {
-			errs = append(errs, fmt.Errorf("field Price.Currency is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Price.Currency is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Area.Value == 0 {
-			errs = append(errs, fmt.Errorf("field Area.Value is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Area.Value is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Area.Unit == "" {
-			errs = append(errs, fmt.Errorf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.NewFlat == "" {
-			errs = append(errs, fmt.Errorf("field NewFlat is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field NewFlat is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Floor == 0 {
-			errs = append(errs, fmt.Errorf("field Floor is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field Floor is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.FloorsTotal == 0 {
-			errs = append(errs, fmt.Errorf("field FloorsTotal is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field FloorsTotal is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuildingName == "" {
-			errs = append(errs, fmt.Errorf("field BuildingName is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field BuildingName is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.YandexBuildingID == 0 {
-			errs = append(errs, fmt.Errorf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.YandexHouseID == 0 {
-			errs = append(errs, fmt.Errorf("field YandexHouseID is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field YandexHouseID is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuildingState == "" {
-			errs = append(errs, fmt.Errorf("field BuildingState is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field BuildingState is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuiltYear == 0 {
-			errs = append(errs, fmt.Errorf("field BuiltYear is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field BuiltYear is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.ReadyQuarter == 0 {
-			errs = append(errs, fmt.Errorf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID))
+			results = append(results, fmt.Sprintf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID))
 		}
 	}
-	return errs
+	return results
 }

@@ -2,7 +2,6 @@ package price_placements_feeds
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -38,7 +37,6 @@ type Ad struct {
 	Decoration      string  `xml:"Decoration"`
 	DealType        string  `xml:"DealType"`
 	RoomType        struct {
-		Text   string `xml:",chardata"`
 		Option string `xml:"Option"`
 	} `xml:"RoomType"`
 	Status           string `xml:"Status"`
@@ -90,66 +88,67 @@ func (f *AvitoFeed) Get(url string) (err error) {
 	return nil
 }
 
-func (f *AvitoFeed) Check() (errs []error) {
+func (f *AvitoFeed) Check() (results []string) {
 
 	if len(f.Ad) == 0 {
-		errs = append(errs, errors.New("feed is empty"))
-		return errs
+		results = append(results, emptyFeed)
+		return results
 	}
+
 	if len(f.Ad) <= 10 {
-		errs = append(errs, fmt.Errorf("feed contains only %v items", len(f.Ad)))
-		return errs
+		results = append(results, fmt.Sprintf("feed contains only %v items", len(f.Ad)))
+		return results
 	}
 
 	for idx, lot := range f.Ad {
 		if lot.ID == "" {
-			errs = append(errs, fmt.Errorf("field ID is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field ID is empty. Position: %v", idx))
 		}
 		if lot.Description == "" {
-			errs = append(errs, fmt.Errorf("field Description is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Description is empty. Position: %v", idx))
 		}
 		if lot.Category == "" {
-			errs = append(errs, fmt.Errorf("field Category is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Category is empty. Position: %v", idx))
 		}
 		if lot.Price == 0 {
-			errs = append(errs, fmt.Errorf("field Price is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Price is empty. Position: %v", idx))
 		}
 		if lot.OperationType == "" {
-			errs = append(errs, fmt.Errorf("field OperationType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field OperationType is empty. Position: %v", idx))
 		}
 		if lot.MarketType == "" {
-			errs = append(errs, fmt.Errorf("field MarketType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field MarketType is empty. Position: %v", idx))
 		}
 		if lot.HouseType == "" {
-			errs = append(errs, fmt.Errorf("field HouseType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field HouseType is empty. Position: %v", idx))
 		}
 		if lot.Floor == 0 {
-			errs = append(errs, fmt.Errorf("field Floor is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Floor is empty. Position: %v", idx))
 		}
 		if lot.Floors == 0 {
-			errs = append(errs, fmt.Errorf("field Floors is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Floors is empty. Position: %v", idx))
 		}
 		if lot.Rooms == "" {
-			errs = append(errs, fmt.Errorf("field Rooms is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Rooms is empty. Position: %v", idx))
 		}
 		if lot.Square == 0 {
-			errs = append(errs, fmt.Errorf("field Square is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Square is empty. Position: %v", idx))
 		}
 		if lot.Status == "" {
-			errs = append(errs, fmt.Errorf("field Status is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Status is empty. Position: %v", idx))
 		}
 		if lot.NewDevelopmentId == "" {
-			errs = append(errs, fmt.Errorf("field NewDevelopmentId is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field NewDevelopmentId is empty. Position: %v", idx))
 		}
 		if lot.PropertyRights == "" {
-			errs = append(errs, fmt.Errorf("field PropertyRights is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field PropertyRights is empty. Position: %v", idx))
 		}
 		if lot.Decoration == "" {
-			errs = append(errs, fmt.Errorf("field Decoration is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Decoration is empty. Position: %v", idx))
 		}
 
 	}
-	return errs
+	return results
 }
 
 type AvitoDevelopments struct {
