@@ -111,10 +111,10 @@ type Flat struct {
 
 func (f *DomclickFeed) Get(url string) (err error) {
 	resp, err := GetResponse(url)
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	err = statusCodeHandler(resp)
 	if err != nil {

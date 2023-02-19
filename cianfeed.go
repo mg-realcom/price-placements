@@ -116,10 +116,10 @@ func (cf *CustomFloat64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 
 func (f *CianFeed) Get(url string) (err error) {
 	resp, err := GetResponse(url)
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	err = statusCodeHandler(resp)
 	if err != nil {
