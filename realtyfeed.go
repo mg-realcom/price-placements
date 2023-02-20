@@ -55,29 +55,29 @@ type Offer struct {
 		Value    float32 `xml:"value"`
 		Currency string  `xml:"currency"`
 	} `xml:"price"`
-	NewFlat          string  `xml:"new-flat"`
-	DealStatus       string  `xml:"deal-status"`
-	BuiltYear        int64   `xml:"built-year"`
-	ReadyQuarter     int64   `xml:"ready-quarter"`
-	Area             Value   `xml:"area"`
-	RoomSpace        []Value `xml:"room-space"`
-	LivingSpace      Value   `xml:"living-space"`
-	KitchenSpace     Value   `xml:"kitchen-space"`
-	Renovation       string  `xml:"renovation"`
-	Rooms            int64   `xml:"rooms"`
-	RubbishChute     string  `xml:"rubbish-chute"`
-	FloorsTotal      int64   `xml:"floors-total"`
-	Floor            int64   `xml:"floor"`
-	BuildingName     string  `xml:"building-name"`
-	BuildingType     string  `xml:"building-type"`
-	Mortgage         string  `xml:"mortgage"`
-	BuildingState    string  `xml:"building-state"`
-	Lift             string  `xml:"lift"`
-	BathroomUnit     string  `xml:"bathroom-unit"`
-	YandexBuildingID int64   `xml:"yandex-building-id"`
-	YandexHouseID    int64   `xml:"yandex-house-id"`
-	BuildingSection  string  `xml:"building-section"`
-	Balcony          string  `xml:"balcony"`
+	NewFlat          string      `xml:"new-flat"`
+	DealStatus       string      `xml:"deal-status"`
+	BuiltYear        int64       `xml:"built-year"`
+	ReadyQuarter     int64       `xml:"ready-quarter"`
+	Area             Value       `xml:"area"`
+	RoomSpace        []Value     `xml:"room-space"`
+	LivingSpace      Value       `xml:"living-space"`
+	KitchenSpace     Value       `xml:"kitchen-space"`
+	Renovation       string      `xml:"renovation"`
+	Rooms            int64       `xml:"rooms"`
+	RubbishChute     string      `xml:"rubbish-chute"`
+	FloorsTotal      int64       `xml:"floors-total"`
+	Floor            int64       `xml:"floor"`
+	BuildingName     string      `xml:"building-name"`
+	BuildingType     string      `xml:"building-type"`
+	Mortgage         string      `xml:"mortgage"`
+	BuildingState    string      `xml:"building-state"`
+	Lift             string      `xml:"lift"`
+	BathroomUnit     string      `xml:"bathroom-unit"`
+	YandexBuildingID int64       `xml:"yandex-building-id"`
+	YandexHouseID    CustomInt64 `xml:"yandex-house-id"`
+	BuildingSection  string      `xml:"building-section"`
+	Balcony          string      `xml:"balcony"`
 }
 
 type Value struct {
@@ -93,10 +93,11 @@ type vas struct {
 
 func (f *RealtyFeed) Get(url string) (err error) {
 	resp, err := GetResponse(url)
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+
+	defer resp.Body.Close()
 
 	err = statusCodeHandler(resp)
 	if err != nil {
@@ -188,9 +189,6 @@ func (f *RealtyFeed) Check() (results []string) {
 		}
 		if lot.YandexBuildingID == 0 {
 			results = append(results, fmt.Sprintf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.YandexHouseID == 0 {
-			results = append(results, fmt.Sprintf("field YandexHouseID is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.BuildingState == "" {
 			results = append(results, fmt.Sprintf("field BuildingState is empty. InternalID: %v", lot.InternalID))
