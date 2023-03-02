@@ -36,10 +36,7 @@ type Object struct {
 		FullUrl   string `xml:"FullUrl"`
 	} `xml:"LayoutPhoto"`
 	Photos struct {
-		PhotoSchema []struct {
-			FullUrl   string `xml:"FullUrl"`
-			IsDefault bool   `xml:"IsDefault"`
-		} `xml:"PhotoSchema"`
+		PhotoSchema []PhotoSchema `xml:"PhotoSchema"`
 	} `xml:"Photos"`
 	Category              string  `xml:"Category"`
 	RoomType              string  `xml:"RoomType"`
@@ -94,6 +91,11 @@ type Object struct {
 		} `xml:"UndergroundInfoSchema"`
 	} `xml:"Undergrounds"`
 	IsApartments bool `xml:"isApartments"`
+}
+
+type PhotoSchema struct {
+	FullUrl   string `xml:"FullUrl"`
+	IsDefault bool   `xml:"IsDefault"`
 }
 
 type CustomFloat64 struct {
@@ -162,35 +164,68 @@ func (f *CianFeed) Check() (results []string) {
 		if lot.ExternalId == "" {
 			results = append(results, fmt.Sprintf("field ExternalId is empty. Position: %v", idx))
 		}
+		if lot.Address == "" {
+			results = append(results, fmt.Sprintf("field Address is empty. InternalID: %v", lot.ExternalId))
+		}
+		if lot.Phones.PhoneSchema.CountryCode == "" {
+			results = append(results, fmt.Sprintf("field Phones.PhoneSchema.CountryCode is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.Phones.PhoneSchema.Number == "" {
+			results = append(results, fmt.Sprintf("field Phones.PhoneSchema.Number is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.LayoutPhoto.FullUrl == "" {
+			results = append(results, fmt.Sprintf("field LayoutPhoto.FullUrl is empty.InternalID: %v", lot.ExternalId))
+		}
+		for idx, photoSchema := range lot.Photos.PhotoSchema {
+			if photoSchema.FullUrl == "" {
+				results = append(results, fmt.Sprintf("field Photos.PhotoSchema[%v].FullUrl is empty.InternalID: %v", idx, lot.ExternalId))
+			}
+		}
 		if lot.Category == "" {
-			results = append(results, fmt.Sprintf("field Category is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Category is empty.InternalID: %v", lot.ExternalId))
 		}
 		if lot.FlatRoomsCount == 0 {
-			results = append(results, fmt.Sprintf("field FlatRoomsCount is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field FlatRoomsCount is empty.InternalID: %v", lot.ExternalId))
 		}
 		if lot.TotalArea == 0 {
-			results = append(results, fmt.Sprintf("field TotalArea is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field TotalArea is empty.InternalID: %v", lot.ExternalId))
 		}
 		if lot.FloorNumber == 0 {
-			results = append(results, fmt.Sprintf("field FloorNumber is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field FloorNumber is empty.InternalID: %v", lot.ExternalId))
 		}
 		if lot.Building.FloorsCount == 0 {
-			results = append(results, fmt.Sprintf("field Building.FloorsCount is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Building.FloorsCount is empty.InternalID: %v", lot.ExternalId))
 		}
-		if lot.JKSchema.ID == 0 {
-			results = append(results, fmt.Sprintf("field JKSchema.ID is empty. Position: %v", idx))
+		if lot.Building.Deadline.Year == 0 {
+			results = append(results, fmt.Sprintf("field Building.Deadline.Year is empty.InternalID: %v", lot.ExternalId))
 		}
-		if lot.JKSchema.Name == "" {
-			results = append(results, fmt.Sprintf("field JKSchema.Name is empty. Position: %v", idx))
-		}
-		if lot.JKSchema.House.ID == 0 {
-			results = append(results, fmt.Sprintf("field JKSchema.House.ID is empty. Position: %v", idx))
-		}
-		if lot.JKSchema.House.Name == "" {
-			results = append(results, fmt.Sprintf("field JKSchema.House.Name is empty. Position: %v", idx))
+		if lot.Building.Deadline.Quarter == "" {
+			results = append(results, fmt.Sprintf("field Building.Deadline.Quarter is empty.InternalID: %v", lot.ExternalId))
 		}
 		if lot.BargainTerms.Price.Float64 == 0 {
-			results = append(results, fmt.Sprintf("field BargainTerms.Price is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field BargainTerms.Price is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.JKSchema.ID == 0 {
+			results = append(results, fmt.Sprintf("field JKSchema.ID is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.JKSchema.Name == "" {
+			results = append(results, fmt.Sprintf("field JKSchema.Name is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.JKSchema.House.ID == 0 {
+			results = append(results, fmt.Sprintf("field JKSchema.House.ID is empty.InternalID: %v", lot.ExternalId))
+		}
+		if lot.JKSchema.House.Name == "" {
+			results = append(results, fmt.Sprintf("field JKSchema.House.Name is empty.InternalID: %v", lot.ExternalId))
+		}
+
+		if lot.Building.Deadline.Year < int64(time.Now().Year()) && lot.Building.Deadline.IsComplete == false {
+			results = append(results, fmt.Sprintf("field Building.Deadline is False for %v. InternalID: %v", lot.Building.Deadline.Year, lot.ExternalId))
+		}
+		if lot.FloorNumber > lot.Building.FloorsCount {
+			results = append(results, fmt.Sprintf("field FloorNumber is greater than Building.FloorsCount. InternalID: %v", lot.ExternalId))
+		}
+		if len(lot.Photos.PhotoSchema) < 3 {
+			results = append(results, fmt.Sprintf("field Photos.PhotoSchema contains '%v' items. InternalID: %v", len(lot.Photos.PhotoSchema), lot.ExternalId))
 		}
 	}
 	return results

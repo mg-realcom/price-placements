@@ -103,49 +103,65 @@ func (f *AvitoFeed) Check() (results []string) {
 		if lot.ID == "" {
 			results = append(results, fmt.Sprintf("field ID is empty. Position: %v", idx))
 		}
+		if lot.ContactPhone == "" {
+			results = append(results, fmt.Sprintf("field ContactPhone is empty. InternalID: %v", lot.ID))
+		}
 		if lot.Description == "" {
-			results = append(results, fmt.Sprintf("field Description is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Description is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Category == "" {
-			results = append(results, fmt.Sprintf("field Category is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Category is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Price == 0 {
-			results = append(results, fmt.Sprintf("field Price is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Price is empty. InternalID: %v", lot.ID))
 		}
 		if lot.OperationType == "" {
-			results = append(results, fmt.Sprintf("field OperationType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field OperationType is empty. InternalID: %v", lot.ID))
 		}
 		if lot.MarketType == "" {
-			results = append(results, fmt.Sprintf("field MarketType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field MarketType is empty. InternalID: %v", lot.ID))
 		}
 		if lot.HouseType == "" {
-			results = append(results, fmt.Sprintf("field HouseType is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field HouseType is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Floor == 0 {
-			results = append(results, fmt.Sprintf("field Floor is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Floor is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Floors == 0 {
-			results = append(results, fmt.Sprintf("field Floors is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Floors is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Rooms == "" {
-			results = append(results, fmt.Sprintf("field Rooms is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Rooms is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Square == 0 {
-			results = append(results, fmt.Sprintf("field Square is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Square is empty. InternalID: %v", lot.ID))
+		}
+		if lot.LivingSpace == 0 {
+			results = append(results, fmt.Sprintf("field LivingSpace is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Status == "" {
-			results = append(results, fmt.Sprintf("field Status is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Status is empty. InternalID: %v", lot.ID))
 		}
 		if lot.NewDevelopmentId == "" {
-			results = append(results, fmt.Sprintf("field NewDevelopmentId is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field NewDevelopmentId is empty. InternalID: %v", lot.ID))
 		}
 		if lot.PropertyRights == "" {
-			results = append(results, fmt.Sprintf("field PropertyRights is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field PropertyRights is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Decoration == "" {
-			results = append(results, fmt.Sprintf("field Decoration is empty. Position: %v", idx))
+			results = append(results, fmt.Sprintf("field Decoration is empty. InternalID: %v", lot.ID))
 		}
-
+		if lot.Floor > lot.Floors {
+			results = append(results, fmt.Sprintf("field Floor is bigger than Floors. InternalID: %v", lot.ID))
+		}
+		for idx, image := range lot.Images.Image {
+			if image.URL == "" {
+				results = append(results, fmt.Sprintf("field Image[%v].URL is empty. InternalID: %v", idx, lot.ID))
+			}
+		}
+		if len(lot.Images.Image) < 3 || len(lot.Images.Image) > 40 {
+			results = append(results, fmt.Sprintf("field Images.Image contains '%v' items. InternalID: %v", len(lot.Images.Image), lot.ID))
+		}
 	}
 	return results
 }

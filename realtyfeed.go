@@ -142,6 +142,22 @@ func (f *RealtyFeed) Check() (results []string) {
 		if lot.InternalID == "" {
 			results = append(results, fmt.Sprintf("field InternalID is empty. Position: %v", idx))
 		}
+		tags := make(map[string]bool)
+		for _, image := range lot.Image {
+			if tags[image.Tag] {
+				continue
+			}
+			tags[image.Tag] = true
+		}
+
+		if _, ok := tags["plan"]; !ok {
+			results = append(results, fmt.Sprintf("tag 'plan' for image is not found. InternalID: %v", lot.InternalID))
+		}
+
+		if _, ok := tags["floor-plan"]; !ok {
+			results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
+		}
+
 		if lot.Type == "" {
 			results = append(results, fmt.Sprintf("field Type is empty. InternalID: %v", lot.InternalID))
 		}
@@ -153,6 +169,9 @@ func (f *RealtyFeed) Check() (results []string) {
 		}
 		if lot.Location.Country == "" {
 			results = append(results, fmt.Sprintf("field Location.Country is empty. InternalID: %v", lot.InternalID))
+		}
+		if lot.Location.Address == "" {
+			results = append(results, fmt.Sprintf("field Location.Address is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.SalesAgent.Phone == "" {
 			results = append(results, fmt.Sprintf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID))
@@ -174,6 +193,12 @@ func (f *RealtyFeed) Check() (results []string) {
 		}
 		if lot.Area.Unit == "" {
 			results = append(results, fmt.Sprintf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
+		}
+		if lot.LivingSpace.Value == 0 {
+			results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
+		}
+		if lot.Rooms == 0 {
+			results = append(results, fmt.Sprintf("field Rooms is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.NewFlat == "" {
 			results = append(results, fmt.Sprintf("field NewFlat is empty. InternalID: %v", lot.InternalID))
@@ -198,6 +223,19 @@ func (f *RealtyFeed) Check() (results []string) {
 		}
 		if lot.ReadyQuarter == 0 {
 			results = append(results, fmt.Sprintf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID))
+		}
+
+		if lot.BuiltYear < int64(time.Now().Year()) && lot.BuildingState == "unfinished" {
+			results = append(results, fmt.Sprintf("BuildingState == unfinished for %v. InternalID: %v", lot.BuiltYear, lot.InternalID))
+		}
+		if lot.Floor > lot.FloorsTotal {
+			results = append(results, fmt.Sprintf("field Floor is bigger than FloorsTotal. InternalID: %v", lot.InternalID))
+		}
+		if int64(len(lot.RoomSpace)) > lot.Rooms {
+			results = append(results, fmt.Sprintf("field RoomSpace contains more values than Rooms. InternalID: %v", lot.InternalID))
+		}
+		if len(lot.Image) < 3 {
+			results = append(results, fmt.Sprintf("field Image contains '%v' items. InternalID: %v", len(lot.Image), lot.InternalID))
 		}
 	}
 	return results
