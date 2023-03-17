@@ -136,7 +136,7 @@ func (f *AvitoFeed) Check() (results []string) {
 		if lot.Square == 0 {
 			results = append(results, fmt.Sprintf("field Square is empty. InternalID: %v", lot.ID))
 		}
-		if lot.LivingSpace == 0 {
+		if lot.LivingSpace == 0 && lot.Rooms != "Студия" {
 			results = append(results, fmt.Sprintf("field LivingSpace is empty. InternalID: %v", lot.ID))
 		}
 		if lot.Status == "" {
