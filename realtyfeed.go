@@ -78,6 +78,7 @@ type Offer struct {
 	YandexHouseID    CustomInt64 `xml:"yandex-house-id"`
 	BuildingSection  string      `xml:"building-section"`
 	Balcony          string      `xml:"balcony"`
+	OpenPlan         string      `xml:"open-plan"`
 }
 
 type Value struct {
@@ -194,7 +195,7 @@ func (f *RealtyFeed) Check() (results []string) {
 		if lot.Area.Unit == "" {
 			results = append(results, fmt.Sprintf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
 		}
-		if lot.LivingSpace.Value == 0 {
+		if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
 			results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
 		}
 		if lot.Rooms == 0 {
