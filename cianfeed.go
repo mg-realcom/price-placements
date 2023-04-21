@@ -74,7 +74,7 @@ type Object struct {
 			ID   int32  `xml:"Id"`
 			Name string `xml:"Name"`
 			Flat struct {
-				FlatNumber    int32  `xml:"FlatNumber"`
+				FlatNumber    string `xml:"FlatNumber"`
 				SectionNumber string `xml:"SectionNumber"`
 				FlatType      string `xml:"FlatType"`
 			} `xml:"Flat"`
