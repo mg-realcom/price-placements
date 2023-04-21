@@ -96,7 +96,7 @@ type Flat struct {
 	Plan        string  `xml:"plan"`
 	Balcony     string  `xml:"balcony"`
 	Renovation  string  `xml:"renovation"`
-	Price       int64   `xml:"price"`
+	Price       float32 `xml:"price"`
 	Area        float32 `xml:"area"`
 	LivingArea  float32 `xml:"living_area"`
 	KitchenArea float32 `xml:"kitchen_area"`
@@ -144,159 +144,91 @@ func (f *DomclickFeed) Get(url string) (err error) {
 }
 
 func (f *DomclickFeed) Check() (results []string) {
-	if len(f.Complex.Buildings.Building) == 0 {
+	if len(f.Complex.Buildings.Building) < 2 {
 		results = append(results, emptyFeed)
 		return results
 	}
-	if f.Complex.ID == "" {
-		results = append(results, fmt.Sprintf("field Complex.ID is empty"))
-	}
-
-	if f.Complex.Name == "" {
-		results = append(results, fmt.Sprintf("field Complex.Name is empty"))
-	}
-
-	if f.Complex.Address == "" {
-		results = append(results, fmt.Sprintf("field Complex.Address is empty"))
-	}
-
-	if f.Complex.Latitude == "" {
-		results = append(results, fmt.Sprintf("field Complex.Latitude is empty"))
-	}
-
-	if f.Complex.Longitude == "" {
-		results = append(results, fmt.Sprintf("field Complex.Longitude is empty"))
-	}
+	path := "Complex"
+	checkString(path, "ID", f.Complex.ID, &results)
+	checkString(path, "Name", f.Complex.Name, &results)
+	checkString(path, "Address", f.Complex.Address, &results)
+	checkString(path, "Latitude", f.Complex.Latitude, &results)
+	checkString(path, "Longitude", f.Complex.Longitude, &results)
 
 	for idx, image := range f.Complex.Images.Image {
-		if image == "" {
-			results = append(results, fmt.Sprintf("field Complex.Images.Image[%d] is empty", idx))
-		}
+		checkStringWithPos(idx, "Complex.Images.Image", "Image", image, &results)
 	}
 
-	if f.Complex.DescriptionMain.Title == "" {
-		results = append(results, fmt.Sprintf("field Complex.DescriptionMain.Title is empty"))
-	}
-
-	if f.Complex.DescriptionMain.Text == "" {
-		results = append(results, fmt.Sprintf("field Complex.DescriptionMain.Text is empty"))
-	}
+	path = "Complex.DescriptionMain"
+	checkString(path, "Title", f.Complex.DescriptionMain.Title, &results)
+	checkString(path, "Text", f.Complex.DescriptionMain.Text, &results)
 
 	for idx, profit := range f.Complex.ProfitsMain.ProfitMain {
-		if profit.Title == "" {
-			results = append(results, fmt.Sprintf("field Complex.ProfitsMain.ProfitMain[%d].Title is empty", idx))
-		}
-		if profit.Text == "" {
-			results = append(results, fmt.Sprintf("field Complex.ProfitsMain.ProfitMain[%d].Text is empty", idx))
-		}
-		if profit.Image == "" {
-			results = append(results, fmt.Sprintf("field Complex.ProfitsMain.ProfitMain[%d].Image is empty", idx))
-		}
+		path := "Complex.ProfitsMain.ProfitMain"
+		checkStringWithPos(idx, path, "Title", profit.Title, &results)
+		checkStringWithPos(idx, path, "Text", profit.Text, &results)
+		checkStringWithPos(idx, path, "Image", profit.Image, &results)
 	}
 
 	for pos, building := range f.Complex.Buildings.Building {
-		if building.ID == "" {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%d].ID is empty", pos))
-		}
-		if building.Fz214 == "" {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].Fz214 is empty", building.ID))
-		}
-		if building.Name == "" {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].Name is empty", building.ID))
-		}
-		if building.Floors == 0 {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].Floors is empty", building.ID))
-		}
-		if building.BuildingState == "" {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].BuildingState is empty", building.ID))
-		}
-		if building.BuiltYear == 0 {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].BuiltYear is empty", building.ID))
-		}
-		if building.ReadyQuarter == 0 {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%d].ReadyQuarter is empty", pos))
-		}
-		if building.BuildingType == "" {
-			results = append(results, fmt.Sprintf("field Complex.Buildings.Building[%s].BuildingType is empty", building.ID))
-		}
+		path := "Complex.Buildings.Building"
+		checkStringWithPos(pos, path, "ID", building.ID, &results)
+		checkStringWithID(building.ID, path, "Fz214", building.Fz214, &results)
+		checkStringWithID(building.ID, path, "Name", building.Name, &results)
+		checkZeroWithID(building.ID, path, "Floors", int(building.Floors), &results)
+		checkStringWithID(building.ID, path, "BuildingState", building.BuildingState, &results)
+		checkZeroWithID(building.ID, path, "BuiltYear", int(building.BuiltYear), &results)
+		checkZeroWithID(building.ID, path, "ReadyQuarter", int(building.ReadyQuarter), &results)
+		checkStringWithID(building.ID, path, "BuildingType", building.BuildingType, &results)
 
 		if building.BuiltYear < int64(time.Now().Year()) && building.BuildingState == "unfinished" {
 			results = append(results, fmt.Sprintf("BuildingState == unfinished for %v. InternalID: %v", building.BuiltYear, building.ID))
 		}
 
-		for idx, lot := range building.Flats.Flat {
-			if lot.FlatID == "" {
-				results = append(results, fmt.Sprintf("Field Flats.FlatID is empty. Position: %v", idx))
-			}
-			if lot.Floor == 0 {
-				results = append(results, fmt.Sprintf("Field Flats.Floor is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Room == nil {
-				results = append(results, fmt.Sprintf("Field Flats.Room is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Plan == "" {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Plan is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Balcony == "" {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Balcony is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Price == 0 {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Price is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Area == 0 {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Area is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.LivingArea == 0 {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.LivingArea is empty. InternalID: %v", lot.FlatID))
-				for i, room := range lot.RoomsArea.Area {
-					if room == "" {
-						results = append(results, fmt.Sprintf("Field Flats.Flat.RoomsArea.Area[%v] is empty. InternalID: %v", i, lot.FlatID))
-					}
-				}
-			}
-			if lot.KitchenArea == 0 {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.KitchenArea is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Bathroom == "" {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Bathroom is empty. InternalID: %v", lot.FlatID))
-			}
-			if lot.Floor > building.Floors {
-				results = append(results, fmt.Sprintf("Field Flats.Flat.Floor is bigger than building.Floors. InternalID: %v", lot.FlatID))
-			}
-		}
+		f.checkLots(building.Flats.Flat, int(building.Floors), &results)
 	}
 
-	if f.Complex.SalesInfo.SalesPhone == "" {
-		results = append(results, fmt.Sprintf("field Complex.SalesInfo.SalesPhone is empty"))
-	}
+	path = "Complex.SalesInfo"
+	checkString(path, "SalesPhone", f.Complex.SalesInfo.SalesPhone, &results)
+	checkString(path, "SalesAddress", f.Complex.SalesInfo.SalesAddress, &results)
+	checkString(path, "SalesLatitude", f.Complex.SalesInfo.SalesLatitude, &results)
+	checkString(path, "SalesLongitude", f.Complex.SalesInfo.SalesLongitude, &results)
 
-	if f.Complex.SalesInfo.SalesAddress == "" {
-		results = append(results, fmt.Sprintf("field Complex.SalesInfo.SalesAddress is empty"))
-	}
-
-	if f.Complex.SalesInfo.SalesLatitude == "" {
-		results = append(results, fmt.Sprintf("field Complex.SalesInfo.SalesLatitude is empty"))
-	}
-
-	if f.Complex.SalesInfo.SalesLongitude == "" {
-		results = append(results, fmt.Sprintf("field Complex.SalesInfo.SalesLongitude is empty"))
-	}
-
-	if f.Complex.Developer.Name == "" {
-		results = append(results, fmt.Sprintf("field Complex.Developer.Name is empty"))
-	}
-
-	if f.Complex.Developer.Phone == "" {
-		results = append(results, fmt.Sprintf("field Complex.Developer.Phone is empty"))
-	}
-
-	if f.Complex.Developer.Site == "" {
-		results = append(results, fmt.Sprintf("field Complex.Developer.Site is empty"))
-	}
-
-	if f.Complex.Developer.Logo == "" {
-		results = append(results, fmt.Sprintf("field Complex.Developer.Logo is empty"))
-	}
+	path = "Complex.Developer"
+	checkString(path, "Name", f.Complex.Developer.Name, &results)
+	checkString(path, "Phone", f.Complex.Developer.Phone, &results)
+	checkString(path, "Site", f.Complex.Developer.Site, &results)
+	checkString(path, "Logo", f.Complex.Developer.Logo, &results)
 
 	return results
+}
+
+func (f *DomclickFeed) checkLots(flats []Flat, floors int, results *[]string) {
+	for idx, lot := range flats {
+		path := "Flats.Flat"
+		checkStringWithPos(idx, path, "FlatID", lot.FlatID, results)
+		checkZeroWithID(lot.FlatID, path, "Floor", int(lot.Floor), results)
+		if lot.Room == nil {
+			*results = append(*results, fmt.Sprintf("Field Flats.Room is empty. InternalID: %v", lot.FlatID))
+		}
+		checkStringWithID(lot.FlatID, path, "Plan", lot.Plan, results)
+		checkStringWithID(lot.FlatID, path, "Balcony", lot.Balcony, results)
+		checkZeroWithID(lot.FlatID, path, "Price", lot.Price, results)
+		checkZeroWithID(lot.FlatID, path, "Area", lot.Area, results)
+		isOk := checkZeroWithID(lot.FlatID, path, "LivingArea", lot.LivingArea, results)
+		if !isOk {
+			for i, room := range lot.RoomsArea.Area {
+				if room == "" {
+					*results = append(*results, fmt.Sprintf("Field Flats.Flat.RoomsArea.Area[%v] is empty. InternalID: %v", i, lot.FlatID))
+				}
+			}
+		}
+
+		checkZeroWithID(lot.FlatID, path, "KitchenArea", lot.KitchenArea, results)
+		checkStringWithID(lot.FlatID, path, "Bathroom", lot.Bathroom, results)
+
+		if lot.Floor > int64(floors) {
+			*results = append(*results, fmt.Sprintf("Field Flats.Flat.Floor is bigger than building.Floors. InternalID: %v", lot.FlatID))
+		}
+	}
 }

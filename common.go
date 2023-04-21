@@ -45,3 +45,43 @@ func (ci *CustomInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	ci.Int64 = int64(customI)
 	return nil
 }
+
+func checkString(path string, fieldName string, value string, results *[]string) (isOk bool) {
+	if value == "" {
+		*results = append(*results, fmt.Sprintf("field %s.%s is empty", path, fieldName))
+		return false
+	}
+	return true
+}
+
+func checkStringWithPos(idx int, path string, fieldName string, value string, results *[]string) (isOk bool) {
+	if value == "" {
+		*results = append(*results, fmt.Sprintf("field %s[%d].%s is empty", path, idx, fieldName))
+		return false
+	}
+	return true
+}
+
+func checkStringWithID(ID string, path string, fieldName string, value string, results *[]string) (isOk bool) {
+	var idMessage string
+	if ID == "" {
+		idMessage = "InternalID not found"
+	} else {
+		idMessage = fmt.Sprintf("InternalID: %s", ID)
+	}
+
+	if value == "" {
+		*results = append(*results, fmt.Sprintf("field %s.%s is empty. %s", path, fieldName, idMessage))
+		return false
+	}
+
+	return true
+}
+
+func checkZeroWithID[V int | float64 | float32](ID string, path string, fieldName string, value V, results *[]string) (isOk bool) {
+	if value == 0 {
+		*results = append(*results, fmt.Sprintf("field %s.%s is empty. InternalID: %s", path, fieldName, ID))
+		return false
+	}
+	return true
+}

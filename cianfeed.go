@@ -151,7 +151,7 @@ func (f *CianFeed) Get(url string) (err error) {
 }
 
 func (f *CianFeed) Check() (results []string) {
-	if len(f.Object) == 0 {
+	if len(f.Object) < 2 {
 		results = append(results, emptyFeed)
 		return results
 	}
@@ -161,62 +161,32 @@ func (f *CianFeed) Check() (results []string) {
 		return results
 	}
 	for idx, lot := range f.Object {
+		id := lot.ExternalId
+
 		if lot.ExternalId == "" {
 			results = append(results, fmt.Sprintf("field ExternalId is empty. Position: %v", idx))
 		}
-		if lot.Address == "" {
-			results = append(results, fmt.Sprintf("field Address is empty. InternalID: %v", lot.ExternalId))
-		}
-		if lot.Phones.PhoneSchema.CountryCode == "" {
-			results = append(results, fmt.Sprintf("field Phones.PhoneSchema.CountryCode is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.Phones.PhoneSchema.Number == "" {
-			results = append(results, fmt.Sprintf("field Phones.PhoneSchema.Number is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.LayoutPhoto.FullUrl == "" {
-			results = append(results, fmt.Sprintf("field LayoutPhoto.FullUrl is empty.InternalID: %v", lot.ExternalId))
-		}
+		checkStringWithID(id, "object", "Address", lot.Address, &results)
+		checkStringWithID(id, "object.Phones.PhoneSchema", "CountryCode", lot.Phones.PhoneSchema.CountryCode, &results)
+		checkStringWithID(id, "object.Phones.PhoneSchema", "Number", lot.Phones.PhoneSchema.Number, &results)
+		checkStringWithID(id, "object.LayoutPhoto.FullUrl", "IsDefault", lot.LayoutPhoto.FullUrl, &results)
+		checkStringWithID(id, "object", "Category", lot.Category, &results)
+
 		for idx, photoSchema := range lot.Photos.PhotoSchema {
-			if photoSchema.FullUrl == "" {
-				results = append(results, fmt.Sprintf("field Photos.PhotoSchema[%v].FullUrl is empty.InternalID: %v", idx, lot.ExternalId))
-			}
+			checkStringWithPos(idx, "object.Photos.PhotoSchema", "FullUrl", photoSchema.FullUrl, &results)
 		}
-		if lot.Category == "" {
-			results = append(results, fmt.Sprintf("field Category is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.FlatRoomsCount == 0 {
-			results = append(results, fmt.Sprintf("field FlatRoomsCount is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.TotalArea == 0 {
-			results = append(results, fmt.Sprintf("field TotalArea is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.FloorNumber == 0 {
-			results = append(results, fmt.Sprintf("field FloorNumber is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.Building.FloorsCount == 0 {
-			results = append(results, fmt.Sprintf("field Building.FloorsCount is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.Building.Deadline.Year == 0 {
-			results = append(results, fmt.Sprintf("field Building.Deadline.Year is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.Building.Deadline.Quarter == "" {
-			results = append(results, fmt.Sprintf("field Building.Deadline.Quarter is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.BargainTerms.Price.Float64 == 0 {
-			results = append(results, fmt.Sprintf("field BargainTerms.Price is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.JKSchema.ID == 0 {
-			results = append(results, fmt.Sprintf("field JKSchema.ID is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.JKSchema.Name == "" {
-			results = append(results, fmt.Sprintf("field JKSchema.Name is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.JKSchema.House.ID == 0 {
-			results = append(results, fmt.Sprintf("field JKSchema.House.ID is empty.InternalID: %v", lot.ExternalId))
-		}
-		if lot.JKSchema.House.Name == "" {
-			results = append(results, fmt.Sprintf("field JKSchema.House.Name is empty.InternalID: %v", lot.ExternalId))
-		}
+
+		checkZeroWithID(id, "object", "FlatRoomsCount", int(lot.FlatRoomsCount), &results)
+		checkZeroWithID(id, "object", "TotalArea", int(lot.TotalArea), &results)
+		checkZeroWithID(id, "object", "FloorNumber", int(lot.FloorNumber), &results)
+		checkZeroWithID(id, "object.Building", "FloorsCount", int(lot.Building.FloorsCount), &results)
+		checkZeroWithID(id, "object.Building.Deadline", "Year", int(lot.Building.Deadline.Year), &results)
+		checkStringWithID(id, "object.Building.Deadline", "Quarter", lot.Building.Deadline.Quarter, &results)
+		checkZeroWithID(id, "object.BargainTerms.Price", "Price", int(lot.BargainTerms.Price.Float64), &results)
+		checkZeroWithID(id, "object.JKSchema", "Id", int(lot.JKSchema.ID), &results)
+		checkStringWithID(id, "object.JKSchema", "Name", lot.JKSchema.Name, &results)
+		checkZeroWithID(id, "object.JKSchema.House", "Id", int(lot.JKSchema.House.ID), &results)
+		checkStringWithID(id, "object.JKSchema.House", "Name", lot.JKSchema.House.Name, &results)
 
 		if lot.Building.Deadline.Year < int64(time.Now().Year()) && lot.Building.Deadline.IsComplete == false {
 			results = append(results, fmt.Sprintf("field Building.Deadline is False for %v. InternalID: %v", lot.Building.Deadline.Year, lot.ExternalId))
@@ -228,5 +198,6 @@ func (f *CianFeed) Check() (results []string) {
 			results = append(results, fmt.Sprintf("field Photos.PhotoSchema contains '%v' items. InternalID: %v", len(lot.Photos.PhotoSchema), lot.ExternalId))
 		}
 	}
+
 	return results
 }

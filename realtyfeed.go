@@ -134,7 +134,7 @@ func (f *RealtyFeed) Get(url string) (err error) {
 
 func (f *RealtyFeed) Check() (results []string) {
 
-	if len(f.Offer) == 0 {
+	if len(f.Offer) < 2 {
 		results = append(results, emptyFeed)
 		return results
 	}
@@ -158,74 +158,32 @@ func (f *RealtyFeed) Check() (results []string) {
 		if _, ok := tags["floor-plan"]; !ok {
 			results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
 		}
+		id := lot.InternalID
+		checkStringWithID(id, "offer", "Type", lot.Type, &results)
+		checkStringWithID(id, "offer", "PropertyType", lot.PropertyType, &results)
+		checkStringWithID(id, "offer", "CreationDate", lot.CreationDate, &results)
+		checkStringWithID(id, "offer.Location", "Country", lot.Location.Country, &results)
+		checkStringWithID(id, "offer.Location", "Address", lot.Location.Address, &results)
+		checkStringWithID(id, "offer.SalesAgent", "Phone", lot.SalesAgent.Phone, &results)
+		checkStringWithID(id, "offer.SalesAgent", "Category", lot.SalesAgent.Category, &results)
+		checkStringWithID(id, "offer", "DealStatus", lot.DealStatus, &results)
+		checkZeroWithID(id, "offer.Price", "Value", lot.Price.Value, &results)
+		checkStringWithID(id, "offer.Price", "Currency", lot.Price.Currency, &results)
+		checkZeroWithID(id, "offer.Area", "Value", lot.Area.Value, &results)
+		checkStringWithID(id, "offer.Area", "Unit", lot.Area.Unit, &results)
+		checkZeroWithID(id, "offer", "Rooms", int(lot.Rooms), &results)
+		checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
+		checkZeroWithID(id, "offer", "Floor", int(lot.Floor), &results)
+		checkZeroWithID(id, "offer", "FloorsTotal", int(lot.FloorsTotal), &results)
+		checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
+		checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
+		checkStringWithID(id, "offer", "BuildingState", lot.BuildingState, &results)
+		checkZeroWithID(id, "offer", "BuiltYear", int(lot.BuiltYear), &results)
+		checkZeroWithID(id, "offer", "ReadyQuarter", int(lot.ReadyQuarter), &results)
 
-		if lot.Type == "" {
-			results = append(results, fmt.Sprintf("field Type is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.PropertyType == "" {
-			results = append(results, fmt.Sprintf("field PropertyType is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.CreationDate == "" {
-			results = append(results, fmt.Sprintf("field CreationDate is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Location.Country == "" {
-			results = append(results, fmt.Sprintf("field Location.Country is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Location.Address == "" {
-			results = append(results, fmt.Sprintf("field Location.Address is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.SalesAgent.Phone == "" {
-			results = append(results, fmt.Sprintf("field SalesAgent.Phone is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.SalesAgent.Category == "" {
-			results = append(results, fmt.Sprintf("field SalesAgent.Category is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.DealStatus == "" {
-			results = append(results, fmt.Sprintf("field DealStatus is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Price.Value == 0 {
-			results = append(results, fmt.Sprintf("field Price.Value is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Price.Currency == "" {
-			results = append(results, fmt.Sprintf("field Price.Currency is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Area.Value == 0 {
-			results = append(results, fmt.Sprintf("field Area.Value is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Area.Unit == "" {
-			results = append(results, fmt.Sprintf("field Area.Unit is empty. InternalID: %v", lot.InternalID))
-		}
 		if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
 			results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
 		}
-		if lot.Rooms == 0 {
-			results = append(results, fmt.Sprintf("field Rooms is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.NewFlat == "" {
-			results = append(results, fmt.Sprintf("field NewFlat is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.Floor == 0 {
-			results = append(results, fmt.Sprintf("field Floor is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.FloorsTotal == 0 {
-			results = append(results, fmt.Sprintf("field FloorsTotal is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.BuildingName == "" {
-			results = append(results, fmt.Sprintf("field BuildingName is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.YandexBuildingID == 0 {
-			results = append(results, fmt.Sprintf("field YandexBuildingID is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.BuildingState == "" {
-			results = append(results, fmt.Sprintf("field BuildingState is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.BuiltYear == 0 {
-			results = append(results, fmt.Sprintf("field BuiltYear is empty. InternalID: %v", lot.InternalID))
-		}
-		if lot.ReadyQuarter == 0 {
-			results = append(results, fmt.Sprintf("field ReadyQuarter is empty. InternalID: %v", lot.InternalID))
-		}
-
 		if lot.BuiltYear < int64(time.Now().Year()) && lot.BuildingState == "unfinished" {
 			results = append(results, fmt.Sprintf("BuildingState == unfinished for %v. InternalID: %v", lot.BuiltYear, lot.InternalID))
 		}

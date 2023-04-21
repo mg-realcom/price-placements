@@ -89,7 +89,7 @@ func (f *AvitoFeed) Get(url string) (err error) {
 
 func (f *AvitoFeed) Check() (results []string) {
 
-	if len(f.Ad) == 0 {
+	if len(f.Ad) < 2 {
 		results = append(results, emptyFeed)
 		return results
 	}
@@ -100,65 +100,36 @@ func (f *AvitoFeed) Check() (results []string) {
 	}
 
 	for idx, lot := range f.Ad {
-		if lot.ID == "" {
-			results = append(results, fmt.Sprintf("field ID is empty. Position: %v", idx))
-		}
-		if lot.ContactPhone == "" {
-			results = append(results, fmt.Sprintf("field ContactPhone is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Description == "" {
-			results = append(results, fmt.Sprintf("field Description is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Category == "" {
-			results = append(results, fmt.Sprintf("field Category is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Price == 0 {
-			results = append(results, fmt.Sprintf("field Price is empty. InternalID: %v", lot.ID))
-		}
-		if lot.OperationType == "" {
-			results = append(results, fmt.Sprintf("field OperationType is empty. InternalID: %v", lot.ID))
-		}
-		if lot.MarketType == "" {
-			results = append(results, fmt.Sprintf("field MarketType is empty. InternalID: %v", lot.ID))
-		}
-		if lot.HouseType == "" {
-			results = append(results, fmt.Sprintf("field HouseType is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Floor == 0 {
-			results = append(results, fmt.Sprintf("field Floor is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Floors == 0 {
-			results = append(results, fmt.Sprintf("field Floors is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Rooms == "" {
-			results = append(results, fmt.Sprintf("field Rooms is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Square == 0 {
-			results = append(results, fmt.Sprintf("field Square is empty. InternalID: %v", lot.ID))
-		}
+		checkStringWithPos(idx, "Ad", "ID", lot.ID, &results)
+		id := lot.ID
+		checkStringWithID(id, "Ad", "ContactPhone", lot.ContactPhone, &results)
+		checkStringWithID(id, "Ad", "Description", lot.Description, &results)
+		checkStringWithID(id, "Ad", "Category", lot.Category, &results)
+		checkZeroWithID(id, "Ad", "Price", int(lot.Price), &results)
+		checkStringWithID(id, "Ad", "OperationType", lot.OperationType, &results)
+		checkStringWithID(id, "Ad", "MarketType", lot.MarketType, &results)
+		checkStringWithID(id, "Ad", "HouseType", lot.HouseType, &results)
+		checkZeroWithID(id, "Ad", "Floor", int(lot.Floor), &results)
+		checkZeroWithID(id, "Ad", "Floors", int(lot.Floors), &results)
+		checkStringWithID(id, "Ad", "Rooms", lot.Rooms, &results)
+		checkZeroWithID(id, "Ad", "Square", lot.Square, &results)
+
 		if lot.LivingSpace == 0 && lot.Rooms != "Студия" {
 			results = append(results, fmt.Sprintf("field LivingSpace is empty. InternalID: %v", lot.ID))
 		}
-		if lot.Status == "" {
-			results = append(results, fmt.Sprintf("field Status is empty. InternalID: %v", lot.ID))
-		}
-		if lot.NewDevelopmentId == "" {
-			results = append(results, fmt.Sprintf("field NewDevelopmentId is empty. InternalID: %v", lot.ID))
-		}
-		if lot.PropertyRights == "" {
-			results = append(results, fmt.Sprintf("field PropertyRights is empty. InternalID: %v", lot.ID))
-		}
-		if lot.Decoration == "" {
-			results = append(results, fmt.Sprintf("field Decoration is empty. InternalID: %v", lot.ID))
-		}
+
+		checkStringWithID(id, "Ad", "Status", lot.Status, &results)
+		checkStringWithID(id, "Ad", "NewDevelopmentId", lot.NewDevelopmentId, &results)
+		checkStringWithID(id, "Ad", "PropertyRights", lot.PropertyRights, &results)
+		checkStringWithID(id, "Ad", "Decoration", lot.Decoration, &results)
+
 		if lot.Floor > lot.Floors {
 			results = append(results, fmt.Sprintf("field Floor is bigger than Floors. InternalID: %v", lot.ID))
 		}
 		for idx, image := range lot.Images.Image {
-			if image.URL == "" {
-				results = append(results, fmt.Sprintf("field Image[%v].URL is empty. InternalID: %v", idx, lot.ID))
-			}
+			checkStringWithPos(idx, "Images.Image", "URL", image.URL, &results)
 		}
+
 		if len(lot.Images.Image) < 3 || len(lot.Images.Image) > 40 {
 			results = append(results, fmt.Sprintf("field Images.Image contains '%v' items. InternalID: %v", len(lot.Images.Image), lot.ID))
 		}
