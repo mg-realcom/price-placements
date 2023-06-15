@@ -17,9 +17,11 @@ type RealtyFeed struct {
 
 type Offer struct {
 	InternalID string `xml:"internal-id,attr"`
-	Image      []struct {
+
+	Image []struct {
 		Tag string `xml:"tag,attr"`
 	} `xml:"image"`
+
 	Type           string   `xml:"type"`
 	PropertyType   string   `xml:"property-type"`
 	Category       string   `xml:"category"`
@@ -69,12 +71,14 @@ type Offer struct {
 	FloorsTotal      int64       `xml:"floors-total"`
 	Floor            int64       `xml:"floor"`
 	BuildingName     string      `xml:"building-name"`
+	VillageName      string      `xml:"village-name"`
 	BuildingType     string      `xml:"building-type"`
 	Mortgage         string      `xml:"mortgage"`
 	BuildingState    string      `xml:"building-state"`
 	Lift             string      `xml:"lift"`
 	BathroomUnit     string      `xml:"bathroom-unit"`
 	YandexBuildingID int64       `xml:"yandex-building-id"`
+	YandexVillageID  int64       `xml:"yandex-village-id"`
 	YandexHouseID    CustomInt64 `xml:"yandex-house-id"`
 	BuildingSection  string      `xml:"building-section"`
 	Balcony          string      `xml:"balcony"`
@@ -158,7 +162,25 @@ func (f *RealtyFeed) Check() (results []string) {
 		if _, ok := tags["floor-plan"]; !ok {
 			results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
 		}
+
+		if lot.Type == "" {
+			results = append(results, fmt.Sprintf("tag 'Type'  is not found. InternalID: %v", lot.InternalID))
+		}
+
 		id := lot.InternalID
+
+		if lot.BuildingName == "" {
+			checkStringWithID(id, "offer", "VillageName", lot.VillageName, &results)
+		} else {
+			checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
+		}
+
+		if lot.YandexBuildingID == 0 {
+			checkZeroWithID(id, "offer", "YandexVillageID", int(lot.YandexVillageID), &results)
+		} else {
+			checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
+		}
+
 		checkStringWithID(id, "offer", "Type", lot.Type, &results)
 		checkStringWithID(id, "offer", "PropertyType", lot.PropertyType, &results)
 		checkStringWithID(id, "offer", "CreationDate", lot.CreationDate, &results)
@@ -175,8 +197,6 @@ func (f *RealtyFeed) Check() (results []string) {
 		checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
 		checkZeroWithID(id, "offer", "Floor", int(lot.Floor), &results)
 		checkZeroWithID(id, "offer", "FloorsTotal", int(lot.FloorsTotal), &results)
-		checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
-		checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
 		checkStringWithID(id, "offer", "BuildingState", lot.BuildingState, &results)
 		checkZeroWithID(id, "offer", "BuiltYear", int(lot.BuiltYear), &results)
 		checkZeroWithID(id, "offer", "ReadyQuarter", int(lot.ReadyQuarter), &results)
