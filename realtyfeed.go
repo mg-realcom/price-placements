@@ -155,10 +155,6 @@ func (f *RealtyFeed) Check() (results []string) {
 			tags[image.Tag] = true
 		}
 
-		if _, ok := tags["plan"]; !ok {
-			results = append(results, fmt.Sprintf("tag 'plan' for image is not found. InternalID: %v", lot.InternalID))
-		}
-
 		if lot.Type == "" {
 			results = append(results, fmt.Sprintf("tag 'Type'  is not found. InternalID: %v", lot.InternalID))
 		}
@@ -177,6 +173,9 @@ func (f *RealtyFeed) Check() (results []string) {
 			}
 			if _, ok := tags["floor-plan"]; !ok {
 				results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
+			}
+			if _, ok := tags["plan"]; !ok {
+				results = append(results, fmt.Sprintf("tag 'plan' for image is not found. InternalID: %v", lot.InternalID))
 			}
 		}
 
