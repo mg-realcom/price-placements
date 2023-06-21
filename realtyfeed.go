@@ -159,26 +159,25 @@ func (f *RealtyFeed) Check() (results []string) {
 			results = append(results, fmt.Sprintf("tag 'plan' for image is not found. InternalID: %v", lot.InternalID))
 		}
 
-		if _, ok := tags["floor-plan"]; !ok {
-			results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
-		}
-
 		if lot.Type == "" {
 			results = append(results, fmt.Sprintf("tag 'Type'  is not found. InternalID: %v", lot.InternalID))
 		}
 
 		id := lot.InternalID
 
-		if lot.BuildingName == "" {
+		if lot.VillageName != "" {
 			checkStringWithID(id, "offer", "VillageName", lot.VillageName, &results)
-		} else {
-			checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
-		}
-
-		if lot.YandexBuildingID == 0 {
 			checkZeroWithID(id, "offer", "YandexVillageID", int(lot.YandexVillageID), &results)
 		} else {
+			checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
 			checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
+			checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
+			if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
+				results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
+			}
+			if _, ok := tags["floor-plan"]; !ok {
+				results = append(results, fmt.Sprintf("tag 'floor-plan' for image is not found. InternalID: %v", lot.InternalID))
+			}
 		}
 
 		checkStringWithID(id, "offer", "Type", lot.Type, &results)
@@ -194,16 +193,13 @@ func (f *RealtyFeed) Check() (results []string) {
 		checkZeroWithID(id, "offer.Area", "Value", lot.Area.Value, &results)
 		checkStringWithID(id, "offer.Area", "Unit", lot.Area.Unit, &results)
 		checkZeroWithID(id, "offer", "Rooms", int(lot.Rooms), &results)
-		checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
+
 		checkZeroWithID(id, "offer", "Floor", int(lot.Floor), &results)
 		checkZeroWithID(id, "offer", "FloorsTotal", int(lot.FloorsTotal), &results)
 		checkStringWithID(id, "offer", "BuildingState", lot.BuildingState, &results)
 		checkZeroWithID(id, "offer", "BuiltYear", int(lot.BuiltYear), &results)
 		checkZeroWithID(id, "offer", "ReadyQuarter", int(lot.ReadyQuarter), &results)
 
-		if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
-			results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
-		}
 		if lot.BuiltYear < int64(time.Now().Year()) && lot.BuildingState == "unfinished" {
 			results = append(results, fmt.Sprintf("BuildingState == unfinished for %v. InternalID: %v", lot.BuiltYear, lot.InternalID))
 		}
