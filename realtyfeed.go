@@ -176,10 +176,12 @@ func (f *RealtyFeed) Check() (results []string) {
 		} else if lot.VillageName != "" {
 			checkStringWithID(id, "offer", "VillageName", lot.VillageName, &results)
 			checkZeroWithID(id, "offer", "YandexVillageID", int(lot.YandexVillageID), &results)
+			checkStringWithID(id, "offer.Area", "Unit", lot.Area.Unit, &results)
 		} else {
 			checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
 			checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
 			checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
+			checkStringWithID(id, "offer.Area", "Unit", lot.Area.Unit, &results)
 			if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
 				results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
 			}
@@ -202,7 +204,6 @@ func (f *RealtyFeed) Check() (results []string) {
 		checkZeroWithID(id, "offer.Price", "Value", lot.Price.Value, &results)
 		checkStringWithID(id, "offer.Price", "Currency", lot.Price.Currency, &results)
 		checkZeroWithID(id, "offer.Area", "Value", lot.Area.Value, &results)
-		checkStringWithID(id, "offer.Area", "Unit", lot.Area.Unit, &results)
 		checkZeroWithID(id, "offer", "Rooms", int(lot.Rooms), &results)
 
 		checkZeroWithID(id, "offer", "Floor", int(lot.Floor), &results)
