@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -161,7 +162,18 @@ func (f *RealtyFeed) Check() (results []string) {
 
 		id := lot.InternalID
 
-		if lot.VillageName != "" {
+		if strings.Contains(strings.ToLower(lot.BuildingName), "akvilon") {
+			checkStringWithID(id, "offer", "BuildingName", lot.BuildingName, &results)
+			checkZeroWithID(id, "offer", "YandexBuildingID", int(lot.YandexBuildingID), &results)
+			checkStringWithID(id, "offer", "NewFlat", lot.NewFlat, &results)
+			if lot.LivingSpace.Value == 0 && lot.OpenPlan != "1" {
+				results = append(results, fmt.Sprintf("field LivingSpace.Value is empty. InternalID: %v", lot.InternalID))
+			}
+			if _, ok := tags["plan"]; !ok {
+				results = append(results, fmt.Sprintf("tag 'plan' for image is not found. InternalID: %v", lot.InternalID))
+			}
+
+		} else if lot.VillageName != "" {
 			checkStringWithID(id, "offer", "VillageName", lot.VillageName, &results)
 			checkZeroWithID(id, "offer", "YandexVillageID", int(lot.YandexVillageID), &results)
 		} else {
